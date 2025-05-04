@@ -1,0 +1,166 @@
+
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Inventory Transactions</h1>
+        <button class="btn btn-success" (click)="insertTransaction()">
+            <i class="fas fa-plus me-2"></i>Add New
+        </button>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Search Input -->
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Search transactions...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-primary w-100" (click)="searchTransaction()">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="col-md-3">
+                    <select class="form-select" [(ngModel)]="filterType">
+                        <option value="ALL">All Types</option>
+                        <option value="IMPORT">Import</option>
+                        <option value="EXPORT">Export</option>
+                        <option value="ADJUSTMENT">Adjustment</option>
+                        <option value="TRANSFER">Transfer</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">From</label>
+                    <input type="date" class="form-control" [(ngModel)]="startDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">To</label>
+                    <input type="date" class="form-control" [(ngModel)]="endDate">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-outline-primary w-100 mt-4" (click)="applyFilters()">
+                        <i class="fas fa-filter me-2"></i>Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="80px">ID</th>
+                            <th width="150px">Date</th>
+                            <th>Product</th>
+                            <th>Warehouse</th>
+                            <th width="120px">Type</th>
+                            <th width="120px">Quantity</th>
+                            <th>Note</th>
+                            <th width="180px">Actions</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        @for(transaction of transactions; track transaction.id) {
+                        <tr>
+                            <td class="fw-bold">{{ transaction.id }}</td>
+                            <td>{{ transaction.createdAt | date:'medium' }}</td>
+                            <td>{{ transaction.product.name }}</td>
+                            <td>{{ transaction.warehouse.name }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                                        'bg-primary': transaction.transactionType === 'IMPORT',
+                                        'bg-warning text-dark': transaction.transactionType === 'EXPORT',
+                                        'bg-info': transaction.transactionType === 'ADJUSTMENT',
+                                        'bg-secondary': transaction.transactionType === 'TRANSFER'
+                                      }">
+                                    {{ transaction.transactionType }}
+                                </span>
+                            </td>
+                            <td class="fw-bold" [class.text-success]="transaction.quantityChange > 0"
+                                [class.text-danger]="transaction.quantityChange < 0">
+                                {{ transaction.quantityChange > 0 ? '+' : '' }}{{ transaction.quantityChange }}
+                            </td>
+                            <td>{{ transaction.note }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        (click)="updateTransaction(transaction.id)">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        (click)="deleteTransaction(transaction.id)">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+
+                    
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            @if(transactions.length === 0) {
+            <div class="text-center py-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <h5>No transactions found</h5>
+                <p class="text-muted">Try adjusting your search or filters</p>
+            </div>
+            }
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if(totalPages > 1) {
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if(currentPage > 1) {
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(1)">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+                }
+
+                @for(page of visiblePages; track page) {
+                <li class="page-item" [ngClass]="{'active': page === currentPage}">
+                    <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+                </li>
+                }
+
+                @if(currentPage < totalPages) { <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" (click)="onPageChange(totalPages)">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    }
+            </ul>
+        </nav>
+    </div>
+    }
+</div>

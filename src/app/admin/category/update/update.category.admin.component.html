@@ -1,21 +1,38 @@
 @if(updatedCategory) {
-  <div>      
-    <!-- Form cập nhật thông tin sản phẩm -->
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6 offset-md-3">
-          <h3>Update Category</h3>
-          <form (ngSubmit)="updateCategory()">
-            <div class="form-group mb-3">
-              <label for="name">Name:</label>
-              <input type="text" id="name" 
-                [(ngModel)]="updatedCategory.name" 
-                name="name" class="form-control" required>
-            </div>                  
-            <button type="submit" class="btn btn-primary">Update</button>
-          </form>
-        </div>
+<div class="container py-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-header bg-primary text-white rounded-top-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fas fa-edit me-2"></i>Update Category
+        </h3>
+        <button class="btn btn-sm btn-light" (click)="goBack()">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
     </div>
+
+    <div class="card-body p-4">
+      <form (ngSubmit)="updateCategory()" class="needs-validation" novalidate>
+        <div class="mb-4">
+          <label for="name" class="form-label fw-bold">
+            <i class="fas fa-tag me-2 text-muted"></i>Category Name
+          </label>
+          <input type="text" id="name" [(ngModel)]="updatedCategory.name" name="name"
+            class="form-control form-control-lg border-2" placeholder="Enter category name..." required>
+          <div class="invalid-feedback">Please provide a category name</div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-3 pt-2">
+          <button type="button" class="btn btn-outline-secondary px-4 rounded-3" (click)="goBack()">
+            <i class="fas fa-arrow-left me-2"></i>Exit
+          </button>
+          <button type="submit" class="btn btn-primary px-4 rounded-3" [disabled]="!updatedCategory.name">
+            <i class="fas fa-save me-2"></i>Update
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
+</div>
 }

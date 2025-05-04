@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CategoryService } from '../../../../service/category.service';
 import { ProductService } from '../../../../service/product.service';
+import { TokenService } from '../../../../service/token.service';
 
 @Component({
   selector: 'app-insert.category.admin',
@@ -31,23 +32,28 @@ export class InsertCategoryAdminComponent implements OnInit {
     private router: Router,
     private categoryService: CategoryService,
     private productService: ProductService,
+    private tokenService: TokenService,
   ) {
 
   }
   ngOnInit() {
-
+    if (this.tokenService.isTokenExpired() || !this.tokenService.getToken()) {
+      this.router.navigate(['/login']); // Redirect to login if token is invalid
+    }
   }
 
   insertCategory() {
     this.categoryService.insertCategory(this.insertCategoryDTO).subscribe({
       next: (response) => {
-
         this.router.navigate(['/admin/categories']);
       },
       error: (error: HttpErrorResponse) => {
-        ;
         console.error(error?.error?.message ?? '');
       }
     });
+  }
+
+  goBack() {
+    this.router.navigate(['/admin/categories']);
   }
 }

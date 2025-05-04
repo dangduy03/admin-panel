@@ -17,5 +17,5 @@ export interface Order {
   tracking_number: string;
   payment_method: string;
   active: boolean;
-  order_details: OrderDetail[];
+  order_details?: OrderDetail[];
 }

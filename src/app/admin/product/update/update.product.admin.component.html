@@ -1,60 +1,95 @@
 @if(product) {
-<div>
-  <!-- Form cập nhật thông tin sản phẩm -->
+<div class="update-product-container">
   <div class="container">
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <h3>Update Product</h3>
-        <form (ngSubmit)="updateProduct()">
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" [(ngModel)]="updatedProduct.name" name="name" class="form-control" required>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="price">Price:</label>
-            <input type="text" id="price" [(ngModel)]="updatedProduct.price" name="price" class="form-control col-md-3"
-              required>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="description">Description:</label>
-            <textarea id="description" [(ngModel)]="updatedProduct.description" name="description" class="form-control"
-              required></textarea>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="category">Category:</label>
-            <select id="category" [(ngModel)]="updatedProduct.category_id" name="category" class="form-control"
-              required>
-              @for(category of categories; track category.id) {
-              <option [value]="category.id">{{ category.name }}
-              </option>
-              }
-            </select>
-          </div>
-          Copy
-          <div class="row mb-3">
-            <div class="thumbnail-container">
-              @for(productImage of product.product_images;
-              track productImage.image_url; let i = $index) {
-              <div class="thumbnail-item" [ngClass]="{'active': i === currentImageIndex}" (click)="thumbnailClick(i)">
-                <img [src]="productImage.image_url" class="thumbnail-image" alt="Thumbnail Image">
-                <button type="button" class="btn btn-sm remove-image" (click)="deleteImage(productImage)">
-                  <i class="fa fa-times-circle text-danger"></i>
-                </button>
-              </div>
-              } @empty {
-              <h2>No images found</h2>
-              }
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h3 class="mb-0">Update Product</h3>
+              <button class="btn btn-light btn-sm" (click)="goBack()">
+                <i class="fas fa-arrow-left"></i> Back to Products
+              </button>
             </div>
           </div>
-          <div class="form-group mb-3">
-            <label for="images">Add images (up to 5):</label>
-            <input type="file" id="images" name="images" multiple (change)="onFileChange($event)" accept="image/*">
+
+          <div class="card-body">
+            <form (ngSubmit)="updateProduct()">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group mb-4">
+                    <label for="name" class="form-label fw-bold">Product Name</label>
+                    <input type="text" id="name" [(ngModel)]="updatedProduct.name" name="name"
+                      class="form-control form-control-lg" required>
+                  </div>
+
+                  <div class="form-group mb-4">
+                    <label for="price" class="form-label fw-bold">Price</label>
+                    <div class="input-group">
+                      <span class="input-group-text">VNĐ</span>
+                      <input type="number" id="price" [(ngModel)]="updatedProduct.price" name="price"
+                        class="form-control form-control-lg" min="0" step="0.01" required>
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-4">
+                    <label for="category" class="form-label fw-bold">Category</label>
+                    <select id="category" [(ngModel)]="updatedProduct.category_id" name="category"
+                      class="form-select form-select-lg" required>
+                      @for(category of categories; track category.id) {
+                      <option [value]="category.id">{{ category.name }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group mb-4">
+                    <label for="description" class="form-label fw-bold">Description</label>
+                    <textarea id="description" [(ngModel)]="updatedProduct.description" name="description"
+                      class="form-control form-control-lg" rows="5" required></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group mb-4">
+                <label class="form-label fw-bold">Current Images</label>
+                @if(product.product_images) {
+                <div class="thumbnail-container">
+                  @for(productImage of product.product_images; track productImage.image_url; let i = $index) {
+                  <div class="thumbnail-item" [ngClass]="{'active': i === currentImageIndex}"
+                    (click)="thumbnailClick(i)">
+                    <img [src]="productImage.image_url" class="thumbnail-image img-thumbnail" alt="Product Image">
+                    <button type="button" class="btn btn-sm btn-danger remove-image"
+                      (click)="deleteImage(productImage); $event.stopPropagation()">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                  }
+                </div>
+                } @else {
+                <div class="alert alert-info">No images found for this product</div>
+                }
+              </div>
+
+              <div class="form-group mb-4">
+                <label for="images" class="form-label fw-bold">Add More Images (up to 5)</label>
+                <input type="file" id="images" name="images" class="form-control form-control-lg" multiple
+                  (change)="onFileChange($event)" accept="image/*">
+                <div class="form-text">Select images to upload (JPEG, PNG only)</div>
+              </div>
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <button type="button" class="btn btn-outline-secondary me-md-2" (click)="goBack()">
+                  Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-1"></i> Update Product
+                </button>
+              </div>
+            </form>
           </div>
-          <button type="submit" class="btn btn-primary">Update</button>
-        </form>
+        </div>
       </div>
     </div>
   </div>

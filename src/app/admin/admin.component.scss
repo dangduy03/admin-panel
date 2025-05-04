@@ -1,45 +1,121 @@
-.container-fluid {
-    background-color: white;
-    padding-left: 0 !important; /* Remove left padding */
-    padding-right: 0 !important; /* Remove right padding */
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
-.header {
-    background-color: #333;
-    /* Header background color */
+.admin-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
     color: white;
-    /* Text color */
-    padding: 10px;
-    /* Add padding to the header */
-    text-align: center;
-    /* Center-align text in the header */
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .header-title {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+
+        i {
+            margin-right: 10px;
+        }
+    }
+
+    .logout-btn {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+            background-color: #c0392b;
+        }
+
+        i {
+            margin-right: 5px;
+        }
+    }
 }
 
-#sidebar {
-    background-color: #007bff !important; /* Primary color */
-    color: white; /* Text color */
-    height: 100vh;
-    overflow-y: auto; /* Add scrollbars if content overflows */
+.admin-main {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    margin: 0;
 }
 
-/* Custom CSS for sidebar links */
-#sidebar a {
-    color: white; /* Text color for links */
-    border-top: 1px solid rgba(255, 255, 255, 0.2); /* Add a border line at the top of each link */
-    padding: 10px 15px; /* Add padding to links for spacing */
+.admin-sidebar {
+    width: 250px;
+    background-color: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem 0;
+    height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+
+    .nav {
+        padding: 0 1rem;
+    }
+
+    .nav-item {
+        margin-bottom: 5px;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        color: #555;
+        padding: 12px 15px;
+        border-radius: 5px;
+        transition: all 0.3s;
+
+        &:hover {
+            background-color: #f0f0f0;
+            color: #3498db;
+        }
+
+        &.active {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        i {
+            font-size: 1.1rem;
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+        }
+    }
 }
 
-/* Custom CSS for active link */
-#sidebar a.active {
-    font-weight: bold; /* Highlight active link */
-    background-color: #0056b3;
-}
-
-/* Change background color on hover */
-#sidebar a:hover {
-    background-color: #0056b3; /* Change the background color on hover */
-}
-
-.icon {
-    padding: 5px;
+.admin-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #fff;
+    margin: 0;
+    min-height: calc(100vh - 60px);
+    width: calc(100% - 250px);
 }

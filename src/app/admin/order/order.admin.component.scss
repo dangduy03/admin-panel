@@ -30,3 +30,26 @@
 .button-primary {
     white-space: nowrap;
 }
+
+.table {
+
+    th,
+    td {
+        vertical-align: middle; // Căn giữa nội dung các ô
+    }
+
+    .text-center {
+        text-align: center;
+    }
+}
+
+.search-input {
+    margin-bottom: 15px;
+}
+
+.no-orders {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}

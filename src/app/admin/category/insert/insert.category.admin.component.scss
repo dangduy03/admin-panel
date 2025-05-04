@@ -1,0 +1,33 @@
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    padding: 1.25rem 1.5rem;
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s;
+
+    &:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+}
+
+.btn-outline-secondary {
+    transition: all 0.3s;
+
+    &:hover {
+        background-color: #f8f9fa;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        margin: 0 15px;
+    }
+}

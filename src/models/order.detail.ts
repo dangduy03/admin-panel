@@ -5,6 +5,12 @@ export interface OrderDetail {
     id: number;
     order: Order;
     product: Product;
+    // product?: {
+    //     id: number;
+    //     name?: string;
+    //     price?: number;
+    //     thumbnail?: string;
+    // };
     price: number;
     number_of_products: number;
     total_money: number;

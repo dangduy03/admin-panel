@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { RegisterDTO } from '../dtos/user/register.dto';
 import { LoginDTO } from '../dtos/user/login.dto';
 import { environment } from '../environments/environment';
@@ -9,6 +9,7 @@ import { UserResponse } from '../reponses/user/user.response';
 import { DOCUMENT } from '@angular/common';
 import { ApiResponse } from '../reponses/api.response';
 import { UpdateUserDTO } from '../dtos/user/update.user.dto';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class UserService {
 
   private http = inject(HttpClient);
   private httpUtilService = inject(HttpUtilService);
+  private tokenService = inject(TokenService);
 
   localStorage?: Storage;
 
@@ -68,6 +70,7 @@ export class UserService {
       }
     );
   }
+
   saveUserResponseToLocalStorage(userResponse?: UserResponse) {
     try {
       if (userResponse == null || !userResponse) {
@@ -82,14 +85,13 @@ export class UserService {
       console.error('Error saving user response to local storage:', error);
     }
   }
+
   getUserResponseFromLocalStorage(): UserResponse | null {
     try {
-      // Retrieve the JSON string from local storage using the key
       const userResponseJSON = this.localStorage?.getItem('user');
       if (userResponseJSON == null || userResponseJSON == undefined) {
         return null;
       }
-      // Parse the JSON string back to an object
       const userResponse = JSON.parse(userResponseJSON!);
       console.log('User response retrieved from local storage.');
       return userResponse;
@@ -98,39 +100,87 @@ export class UserService {
         'Error retrieving user response from local storage:',
         error
       );
-      return null; // Return null or handle the error as needed
+      return null;
     }
   }
+
   removeUserFromLocalStorage(): void {
     try {
-      // Remove the user data from local storage using the key
       this.localStorage?.removeItem('user');
       console.log('User data removed from local storage.');
     } catch (error) {
       console.error('Error removing user data from local storage:', error);
-      // Handle the error as needed
     }
   }
+
   getUsers(params: {
     page: number;
     limit: number;
     keyword: string;
   }): Observable<ApiResponse> {
+    const token = this.tokenService.getToken(); // Use TokenService to get token
+
+    if (!token) {
+      // Handle case when token is not available
+      return throwError(() => new Error('No authentication token found'));
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+
     const url = `${environment.apiBaseUrl}/users`;
-    return this.http.get<ApiResponse>(url, { params: params });
+    return this.http.get<ApiResponse>(url, {
+      headers: headers,
+      params: params
+    });
   }
 
+  // resetPassword(userId: number): Observable<ApiResponse> {
+  //   const url = `${environment.apiBaseUrl}/users/reset-password/${userId}`;
+  //   return this.http.put<ApiResponse>(url, null, this.apiConfig);
+  // }
   resetPassword(userId: number): Observable<ApiResponse> {
+    const token = this.tokenService.getToken(); // Lấy token từ TokenService
+
+    if (!token) {
+      return throwError(() => new Error('Không tìm thấy token xác thực'));
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
     const url = `${environment.apiBaseUrl}/users/reset-password/${userId}`;
-    return this.http.put<ApiResponse>(url, null, this.apiConfig);
+    return this.http.put<ApiResponse>(url, null, { headers });
   }
 
+  // toggleUserStatus(params: {
+  //   userId: number;
+  //   enable: boolean;
+  // }): Observable<ApiResponse> {
+  //   const url = `${environment.apiBaseUrl}/users/block/${params.userId}/${params.enable ? '1' : '0'
+  //     }`;
+  //   return this.http.put<ApiResponse>(url, null, this.apiConfig);
+  // }
   toggleUserStatus(params: {
     userId: number;
     enable: boolean;
   }): Observable<ApiResponse> {
-    const url = `${environment.apiBaseUrl}/users/block/${params.userId}/${params.enable ? '1' : '0'
-      }`;
-    return this.http.put<ApiResponse>(url, null, this.apiConfig);
+    const token = this.tokenService.getToken(); // Lấy token từ TokenService
+
+    if (!token) {
+      return throwError(() => new Error('Không tìm thấy token xác thực'));
+    }
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` // Thêm header Authorization
+    });
+
+    const url = `${environment.apiBaseUrl}/users/block/${params.userId}/${params.enable ? '1' : '0'}`;
+    return this.http.put<ApiResponse>(url, null, { headers });
   }
 }

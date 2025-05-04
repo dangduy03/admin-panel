@@ -1,0 +1,47 @@
+<div class="stats-container">
+    <!-- Biểu đồ Doanh thu -->
+    <div class="revenue-chart-section">
+        <h2 class="section-title">Thống kê doanh thu theo tháng</h2>
+
+        <div class="chart-wrapper">
+            <div class="chart-container">
+                <canvas baseChart [data]="revenueData" [options]="chartOptions" [type]="chartType">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="revenue-details">
+            <h3 class="details-title">Chi tiết doanh thu</h3>
+            <div class="card-grid">
+                <div class="card" *ngFor="let month of revenueData.labels; let i = index">
+                    <div class="card-body">
+                        <h4 class="card-title">Tháng {{month}}</h4>
+                        <p class="card-value">{{revenueData.datasets[0].data[i] | number}} triệu</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ Danh mục -->
+    <div class="category-chart-section">
+        <h2 class="section-title">Thống kê theo danh mục</h2>
+
+        <div class="chart-wrapper small-pie-chart">
+            <div class="chart-container">
+                <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="pieChartType">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="category-details">
+            <h3 class="details-title">Tỷ lệ phần trăm</h3>
+            <div class="percentage-list">
+                <div class="percentage-item" *ngFor="let item of pieChartData.labels; let i = index">
+                    <span class="category-name">{{ item }}</span>
+                    <span class="percentage-value">{{ pieChartData.datasets[0].data[i] }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

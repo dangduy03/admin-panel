@@ -1,52 +1,86 @@
-<div class="container-fluid">
-  <header class="header bg-success text-white d-flex justify-content-between">
-    <h1 class="header-title">Dashboard Header</h1>
-    <!-- Logout Button -->
-    <button class="btn btn-danger btn-sm" (click)="logout()">Logout</button>
+<div class="admin-container">
+  <header class="admin-header">
+    <div class="header-content">
+      <h1 class="header-title">
+        <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+      </h1>
+      <button class="logout-btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
   </header>
-  <div class="row">
 
+  <div class="admin-main">
+    <nav class="admin-sidebar">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/orders" routerLinkActive="active">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+            <span class="badge bg-primary rounded-pill">5</span>
+          </a>
+        </li>
 
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/categories" routerLinkActive="active">
+            <i class="fas fa-tags"></i>
+            <span>Categories</span>
+            <span class="badge bg-success rounded-pill">12</span>
+          </a>
+        </li>
 
-    <nav id="sidebar" class="col-md-2 col-lg-2 d-md-block bg-light sidebar">
-      <div class="position-sticky">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link" (click)="showAdminComponent('orders')" routerLink="/admin/orders"
-              routerLinkActive="active">
-              <i class="fab fa-first-order icon"></i>Orders
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/products" routerLinkActive="active">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+            <span class="badge bg-info rounded-pill">24</span>
+          </a>
+        </li>
 
-          <li class="nav-item">
-            <a class="nav-link" (click)="showAdminComponent('categories')" routerLink="/admin/categories"
-              routerLinkActive="active">
-              <i class="fab fa-canadian-maple-leaf icon"></i>Categories
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/users" routerLinkActive="active">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+            <span class="badge bg-warning rounded-pill">8</span>
+          </a>
+        </li>
 
-          <li class="nav-item">
-            <a class="nav-link" (click)="showAdminComponent('products')" routerLink="/admin/products"
-              routerLinkActive="active">
-              <i class="fab fa-codepen icon"></i>Products
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/comments" routerLinkActive="active">
+            <i class="fas fa-users"></i>
+            <span>Comment</span>
+            <span class="badge bg-warning rounded-pill">8</span>
+          </a>
+        </li>
 
-          <li class="nav-item">
-            <a class="nav-link" (click)="showAdminComponent('users')" routerLink="/admin/users"
-              routerLinkActive="active">
-              <i class="fab fa-codepen icon"></i>Users
-            </a>
-          </li>
-        </ul>
-      </div>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/warehouses" routerLinkActive="active">
+            <i class="fas fa-tags"></i>
+            <span>Warehouse</span>
+            <span class="badge bg-success rounded-pill">12</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/transactions" routerLinkActive="active">
+            <i class="fas fa-tags"></i>
+            <span>Transactions</span>
+            <span class="badge bg-success rounded-pill">12</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/stats" routerLinkActive="active">
+            <i class="fas fa-box-open"></i>
+            <span>Stats</span>
+            <span class="badge bg-info rounded-pill">3</span>
+          </a>
+        </li>
+      </ul>
     </nav>
 
-
-
-    <div class="col-md-10 col-lg-10 overflow-auto">
+    <div class="admin-content">
       <router-outlet></router-outlet>
     </div>
-
   </div>
 </div>

@@ -1,7 +1,7 @@
 import {
-    IsString, 
-    IsNotEmpty, 
-    IsPhoneNumber,     
+    IsString,
+    IsNotEmpty,
+    IsPhoneNumber,
 } from 'class-validator';
 
 export class InsertProductDTO {
@@ -16,7 +16,7 @@ export class InsertProductDTO {
 
     category_id: number;
     images: File[] = [];
-    
+
     constructor(data: any) {
         this.name = data.name;
         this.price = data.price;

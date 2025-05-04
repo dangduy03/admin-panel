@@ -1,0 +1,75 @@
+<div class="container">
+    <h1>Warehouse Management</h1>
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <input type="text" class="form-control search-input" placeholder="Search warehouses" >
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary" (click)="searchWarehouses()">Search</button>
+            <button class="btn btn-success ms-2" (click)="insertWarehouse()">Add New</button>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(warehouse of warehouses; track warehouse.id) {
+            <tr>
+                <td>{{ warehouse.id }}</td>
+                <td>{{ warehouse.name }}</td>
+                <td>{{ warehouse.location }}</td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" (click)="updateWarehouse(warehouse.id)">
+                            Update
+                        </button>
+                        <button class="btn btn-danger" (click)="deleteWarehouse(warehouse)">Delete</button>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if(currentPage > 0) {
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(0)">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)">
+                        <i class="fa fa-chevron-left"></i>
+                    </a>
+                </li>
+                }
+
+                @for(page of visiblePages; track page) {
+                <ng-container>
+                    <li class="page-item" [ngClass]="{'active': page === currentPage + 1}">
+                        <a class="page-link" (click)="onPageChange(page - 1)">{{ page }}</a>
+                    </li>
+                </ng-container>
+                }
+
+                @if(currentPage < totalPages - 1) { <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)">
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" (click)="onPageChange(totalPages - 1)">Last</a>
+                    </li>
+                    }
+            </ul>
+        </nav>
+    </div>
+</div>

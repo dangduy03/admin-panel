@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CategoryService } from '../../../service/category.service';
 import { ApiResponse } from '../../../reponses/api.response';
+import { TokenService } from '../../../service/token.service';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class CategoryAdminComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     private router: Router,
+    private tokenService: TokenService,
   ) { }
 
   ngOnInit() {
@@ -61,22 +63,25 @@ export class CategoryAdminComponent implements OnInit {
   }
 
   deleteCategory(category: Category) {
-    const confirmation = window
-      .confirm('Are you sure you want to delete this category?');
+    if (this.tokenService.isTokenExpired() || !this.tokenService.getToken()) {
+      alert('Vui lòng đăng nhập lại!');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const confirmation = confirm('Bạn chắc chắn muốn xóa danh mục này?');
     if (confirmation) {
-
       this.categoryService.deleteCategory(category.id).subscribe({
-        next: (apiResponse: ApiResponse) => {
-
-          console.error('Xóa thành công')
-          location.reload();
+        next: () => {
+          alert('Xóa thành công!');
+          this.getCategories(0, 100); // Load lại danh sách
         },
-        complete: () => {
-          ;
-        },
-        error: (error: HttpErrorResponse) => {
-          ;
-          console.error(error?.error?.message ?? '');
+        error: (error) => {
+          console.error('Lỗi khi xóa:', error);
+          if (error.status === 401) {
+            this.tokenService.removeToken();
+            this.router.navigate(['/login']);
+          }
         }
       });
     }
