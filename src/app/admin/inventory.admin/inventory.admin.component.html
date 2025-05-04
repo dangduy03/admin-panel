@@ -1,0 +1,51 @@
+<!-- <div class="container">
+    <h1>Inventory Management</h1>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <select class="form-select" [(ngModel)]="selectedWarehouseId" (change)="onWarehouseChange()">
+                <option value="0">All Warehouses</option>
+                @for(warehouse of warehouses; track warehouse.id) {
+                <option [value]="warehouse.id">{{ warehouse.name }}</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Search products" [(ngModel)]="productKeyword">
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary" (click)="searchInventory()">Search</button>
+            <button class="btn btn-success ms-2" (click)="adjustInventory()">Adjust Inventory</button>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead class="table-light">
+            <tr>
+                <th>Product</th>
+                <th>Warehouse</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(inventory of inventories; track inventory.id) {
+            <tr>
+                <td>{{ inventory.product?.name }}</td>
+                <td>{{ inventory.warehouse?.name }}</td>
+                <td>{{ inventory.quantity }}</td>
+                <td>
+                    <button class="btn btn-primary" (click)="updateInventory(inventory.id)">Update</button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+
+            </ul>
+        </nav>
+    </div>
+</div> -->

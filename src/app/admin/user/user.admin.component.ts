@@ -53,19 +53,20 @@ export class UserAdminComponent implements OnInit {
   getUsers(keyword: string, page: number, limit: number) {
     this.userService.getUsers({ keyword, page, limit }).subscribe({
       next: (apiResponse: ApiResponse) => {
-
         const response = apiResponse.data
         this.users = response.users;
         this.totalPages = response.totalPages;
         this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
       },
       complete: () => {
-        // Handle complete event
-
       },
       error: (error: HttpErrorResponse) => {
-        ;
-        console.error(error?.error?.message ?? '');
+        if (error.status === 401) {
+          // Nếu lỗi 401 thì chuyển hướng về trang đăng nhập
+          this.router.navigate(['/login']);
+        } else {
+          console.error('Lỗi khi lấy danh sách người dùng:', error?.error?.message ?? '');
+        }
       }
     });
   }
@@ -108,15 +109,15 @@ export class UserAdminComponent implements OnInit {
   resetPassword(userId: number) {
     this.userService.resetPassword(userId).subscribe({
       next: (apiResponse: ApiResponse) => {
-        console.error('Block/unblock user successfully');
-        //location.reload();
-      },
-      complete: () => {
-        // Handle complete event
+        alert('Reset mật khẩu thành công');
       },
       error: (error: HttpErrorResponse) => {
-        ;
-        console.error(error?.error?.message ?? '');
+        if (error.status === 401) {
+          alert('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
+          this.router.navigate(['/login']);
+        } else {
+          alert('Lỗi khi reset mật khẩu: ' + (error.error?.message || ''));
+        }
       }
     });
   }
@@ -144,8 +145,12 @@ export class UserAdminComponent implements OnInit {
           // Handle complete event
         },
         error: (error: HttpErrorResponse) => {
-          ;
-          console.error(error?.error?.message ?? '');
+          if (error.status === 401) {
+            alert('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
+            this.router.navigate(['/login']);
+          } else {
+            alert('Lỗi khi thực hiện thao tác: ' + (error.error?.message || ''));
+          }
         }
       });
     }

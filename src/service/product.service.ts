@@ -1,21 +1,34 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Product } from '../models/product';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../environments/environment';
 import { ApiResponse } from '../reponses/api.response';
 import { UpdateProductDTO } from '../dtos/product/update.product.dto';
 import { InsertProductDTO } from '../dtos/product/insert.product.dto';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  // private apiGetProducts = `${environment.apiBaseUrl}/products`;
+  private tokenService = inject(TokenService);
   private apiBaseUrl = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
   // Chuyển danh sách ID thành một chuỗi và truyền vào params
+
+  private getHeaders(): HttpHeaders {
+    const token = this.tokenService.getToken();
+    if (!token) {
+      console.warn('Token không tồn tại!');
+      return new HttpHeaders({ 'Content-Type': 'application/json' });
+    }
+
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+  }
 
   getProducts(
     keyword?: string,
@@ -55,42 +68,83 @@ export class ProductService {
 
   deleteProduct(productId: number): Observable<ApiResponse> {
     return this.http.delete<ApiResponse>(
-      `${this.apiBaseUrl}/products/${productId}`
+      `${this.apiBaseUrl}/products/${productId}`,
+      { headers: this.getHeaders() }
     );
   }
 
-  updateProduct(
-    productId: number,
-    updatedProduct: UpdateProductDTO
-  ): Observable<ApiResponse> {
+  updateProduct(productId: number, updatedProduct: UpdateProductDTO): Observable<ApiResponse> {
     return this.http.put<ApiResponse>(
       `${this.apiBaseUrl}/products/${productId}`,
-      updatedProduct
+      updatedProduct,
+      { headers: this.getHeaders() }
     );
   }
 
   insertProduct(insertProductDTO: InsertProductDTO): Observable<ApiResponse> {
-    // Add a new product
     return this.http.post<ApiResponse>(
       `${this.apiBaseUrl}/products`,
-      insertProductDTO
+      insertProductDTO,
+      { headers: this.getHeaders() }
     );
   }
 
+  // uploadImages(productId: number, files: File[]): Observable<ApiResponse> {
+  //   const formData = new FormData();
+  //   for (let i = 0; i < files.length; i++) {
+  //     formData.append('images', files[i], files[i].name);
+  //   }
+  //   return this.http.post<ApiResponse>(
+  //     `${this.apiBaseUrl}/products/upload-multiple/${productId}`,
+  //     formData,
+  //     {
+  //       headers: {
+  //         'Authorization': `Bearer ${this.tokenService.getToken()}`
+  //       },
+  //     }
+  //   );
+  // }
+
   uploadImages(productId: number, files: File[]): Observable<ApiResponse> {
     const formData = new FormData();
+    // files.forEach((file, index) => {
+    //   formData.append(`images`, file, file.name);
+    // });
     for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
+      formData.append('images', files[i], files[i].name);
     }
-    // Upload images for the specified product id
-    // return this.http.post<ApiResponse>(`${this.apiBaseUrl}/products/uploads/${productId}`, formData);
+
     return this.http.post<ApiResponse>(
-      `${environment.minioUrl}/products/${productId}`,
-      formData
+      `${this.apiBaseUrl}/products/upload-multiple/${productId}`,
+      formData,
+      {
+        headers: {
+          'Authorization': `Bearer ${this.tokenService.getToken()}`
+        }
+      }
+    ).pipe(
+      catchError(error => {
+        console.error('Error details:', {
+          status: error.status,
+          message: error.message,
+          url: error.url,
+          error: error.error // Log cả nội dung lỗi từ server
+        });
+        return throwError(() => error);
+      })
     );
   }
 
   deleteProductImage(id: number): Observable<any> {
-    return this.http.delete<string>(`${this.apiBaseUrl}/product_images/${id}`);
+    return this.http.delete(
+      `${this.apiBaseUrl}/product_images/${id}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getProductCountByCategory(): Observable<number[]> {
+    return this.http.get<number[]>(`${this.apiBaseUrl}/stats/category-product-count`,
+      { headers: this.getHeaders() }
+    );
   }
 }

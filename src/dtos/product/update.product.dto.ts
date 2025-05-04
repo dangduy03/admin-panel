@@ -15,6 +15,7 @@ export class UpdateProductDTO {
     description: string;
 
     category_id: number;
+    // images: File[] = [];
 
     constructor(data: any) {
         this.name = data.name;

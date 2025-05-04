@@ -93,8 +93,8 @@ export class LoginComponent implements OnInit {
                   this.userService.saveUserResponseToLocalStorage(this.userResponse);
                   if (this.userResponse?.role.name == 'admin') {
                     this.router.navigate(['/admin']);
-                  // } else if(this.userResponse?.role.name == 'user') {
-                  //   this.router.navigate(['/']);
+                  } else if(this.userResponse?.role.name == 'user') {
+                    this.router.navigate(['/']);
                   }
                 },
                 complete: () => {

@@ -1,54 +1,121 @@
-<h1>This is detail order admin</h1>
-<div class="container">
-  <h1>Order Details</h1>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Chi tiết đơn hàng #{{orderResponse.id}}</h1>
+    <button class="btn btn-outline-secondary" (click)="goBack()">
+      <i class="fas fa-arrow-left me-2"></i>Quay lại
+    </button>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h3 class="mb-0">Thông tin đơn hàng</h3>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="fw-bold">Khách hàng:</label>
+            <p>{{ orderResponse.fullname }}</p>
+          </div>
+          <div class="mb-3">
+            <label class="fw-bold">Số điện thoại:</label>
+            <p>{{ orderResponse.phone_number }}</p>
+          </div>
+          <div class="mb-3">
+            <label class="fw-bold">Địa chỉ:</label>
+            <p>{{ orderResponse.address }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="fw-bold">Ngày đặt:</label>
+            <p>{{ orderResponse.order_date | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="mb-3">
+            <label class="fw-bold">Email:</label>
+            <p>{{ orderResponse.email }}</p>
+          </div>
+          <div class="mb-3">
+            <label class="fw-bold">Ghi chú:</label>
+            <p>{{ orderResponse.note || 'Không có ghi chú' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h3 class="mb-0">Danh sách sản phẩm</h3>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th width="40%">Sản phẩm</th>
+              <th width="15%" class="text-end">Đơn giá</th>
+              <th width="15%" class="text-center">Số lượng</th>
+              <th width="15%" class="text-end">Thành tiền</th>
+              <th width="15%"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            @for(order_detail of orderResponse.order_details; track order_detail.product.id) {
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <img [src]="order_detail.product.thumbnail" class="img-thumbnail me-3"
+                    style="width: 60px; height: 60px; object-fit: cover;">
+                  <div>
+                    <h6 class="mb-1">{{ order_detail.product.name }}</h6>
+                    <small class="text-muted">SKU: {{ order_detail.product.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td class="text-end">{{ order_detail.product.price | currency:'VND':'symbol':'1.0-0' }}</td>
+              <td class="text-center">{{ order_detail.number_of_products }}</td>
+              <td class="text-end">{{ order_detail.total_money | currency:'VND':'symbol':'1.0-0' }}</td>
+              <td></td>
+            </tr>
+            }
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <div class="row">
-    <div class="col-md-6">
-      <h3>Order Information</h3>
-      <p><strong>Order ID:</strong> {{ orderResponse.id }}</p>
-      <p><strong>User ID:</strong> {{ orderResponse.user_id }}</p>
-      <p><strong>Full Name:</strong> {{ orderResponse.fullname }}</p>
-      <p><strong>Phone Number:</strong> {{ orderResponse.phone_number }}</p>
-      <p><strong>Email:</strong> {{ orderResponse.email }}</p>
-      <p><strong>Address:</strong> {{ orderResponse.address }}</p>
-      <p><strong>Note:</strong> {{ orderResponse.note }}</p>
-      <p><strong>Order Date:</strong> {{ orderResponse.order_date | date }}</p>
-
-      <div class="form-group">
-        <label for="statusSelect"><strong>Status:</strong></label>
-        <select class="form-control" id="statusSelect" [(ngModel)]="orderResponse.status">
-          <option value="pending">Pending</option>
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
+    <div class="col-md-8">
+      <div class="form-group mb-3">
+        <label class="fw-bold">Trạng thái đơn hàng:</label>
+        <select class="form-select" [(ngModel)]="orderResponse.status">
+          <option value="Pending">Chờ xử lý</option>
+          <option value="Processing">Đang xử lý</option>
+          <option value="Shipped">Đã giao hàng</option>
+          <option value="Delivered">Đã nhận hàng</option>
+          <option value="Cancelled">Đã hủy</option>
         </select>
       </div>
     </div>
-    <h3>Order Details</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <!--<th>Total</th>-->
-        </tr>
-      </thead>
-      <tbody>
-        @for(order_detail of orderResponse.order_details;
-        track order_detail.product.name) {
-        <tr>
-          <td>{{ order_detail.product.name }}</td>
-          <td>
-            <p>{{order_detail.product.price}}</p>
-          <td>
-            <p>{{order_detail.number_of_products}}</p>
-          </td>
-          <td>{{ order_detail.total_money }}</td>
-        </tr>
-        }
-      </tbody>
-    </table>
-    <button class="btn btn-primary col-md-2" (click)="saveOrder()">Save</button>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="fw-bold">Tổng tiền:</span>
+            <span>{{ orderResponse.total_money | currency:'VND':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span class="fw-bold">Phương thức thanh toán:</span>
+            <span>{{ orderResponse.payment_method || 'Chưa xác định' }}</span>
+          </div>
+          <button class="btn btn-primary w-100" (click)="saveOrder()">
+            <i class="fas fa-save me-2"></i>Cập nhật đơn hàng
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
+</div>

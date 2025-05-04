@@ -1,0 +1,56 @@
+<div class="comment-admin-container">
+    <h2>Quản lý bình luận</h2>
+
+    <div class="comments-list">
+        <table *ngIf="comments.length > 0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Người dùng</th>
+                    <th>Sản phẩm</th>
+                    <th>Nội dung</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let comment of comments">
+                    <td>{{ comment.id }}</td>
+                    <td>{{ comment.user?.fullname || 'Nguyễn Quảng' }}</td>
+                    <td>{{ comment.product?.name || 'Sản phẩm ' }}</td>
+                    <td>{{ comment.content }}</td>
+                    <td class="actions">
+                        <button (click)="selectComment(comment)">Sửa</button>
+                        <button (click)="deleteComment(comment.id)" class="delete">Xóa</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="comments.length === 0" class="no-comments">
+            Chưa có bình luận nào
+        </div>
+    </div>
+
+    <div *ngIf="selectedComment" class="edit-modal">
+        <h3>Sửa bình luận</h3>
+        <textarea [(ngModel)]="editContent" rows="4"></textarea>
+        <div class="modal-actions">
+            <button (click)="updateComment()">Lưu</button>
+            <button (click)="selectedComment = null">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<div class="pagination" *ngIf="totalItems > itemsPerPage">
+    <button (click)="currentPage = 0; loadComments()" [disabled]="currentPage === 0">
+        Đầu
+    </button>
+    <button (click)="currentPage = currentPage - 1; loadComments()" [disabled]="currentPage === 0">
+        Trước
+    </button>
+    <span>Trang {{currentPage + 1}}</span>
+    <button (click)="currentPage = currentPage + 1; loadComments()"
+        [disabled]="(currentPage + 1) * itemsPerPage >= totalItems">
+        Sau
+    </button>
+</div>

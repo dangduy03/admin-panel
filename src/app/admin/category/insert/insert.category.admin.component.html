@@ -1,17 +1,30 @@
-<div class="container">
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <h3>Insert Category</h3>
-        <div class="row mb-3">
-          <form (ngSubmit)="insertCategory()">
-            <div class="form-group mb-3">
-              <label for="name">Name:</label>
-              <input type="text" id="name" [(ngModel)]="insertCategoryDTO.name" 
-              name="name" class="form-control" required>
-            </div>              
-            <button type="submit" class="btn btn-primary">Insert</button>
-          </form>
-        </div>        
-      </div>
+<div class="container mt-5">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">
+        <i class="fas fa-plus-circle me-2"></i>Add new category
+      </h3>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="insertCategory()" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="name" class="form-label">
+            <i class="fas fa-tag me-2"></i>New category name
+          </label>
+          <input type="text" id="name" [(ngModel)]="insertCategoryDTO.name" name="name"
+            class="form-control form-control-lg" placeholder="Enter category name..." required>
+          <div class="invalid-feedback">Please enter category name!</div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+          <button type="button" class="btn btn-outline-secondary" (click)="goBack()">
+            <i class="fas fa-arrow-left me-2"></i>Exit
+          </button>
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="fas fa-save me-2"></i>Save
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+</div>

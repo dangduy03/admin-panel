@@ -1,0 +1,149 @@
+.comment-admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+
+    h2 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .search-bar {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+
+        input {
+            padding: 8px;
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #45a049;
+            }
+        }
+    }
+
+    .comments-list {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+
+            th,
+            td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+            th {
+                background-color: #f2f2f2;
+            }
+
+            .actions {
+                display: flex;
+                gap: 5px;
+
+                button {
+                    padding: 5px 10px;
+                    border: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+
+                    &.delete {
+                        background-color: #f44336;
+                        color: white;
+
+                        &:hover {
+                            background-color: #d32f2f;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .no-comments {
+        padding: 20px;
+        text-align: center;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+    }
+
+    .edit-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+
+        textarea {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+
+            button {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+
+                &:first-child {
+                    background-color: #4CAF50;
+                    color: white;
+
+                    &:hover {
+                        background-color: #45a049;
+                    }
+                }
+            }
+        }
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 20px;
+
+        button {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+
+            &.active {
+                background-color: #4CAF50;
+                color: white;
+                border-color: #4CAF50;
+            }
+
+            &:hover:not(.active) {
+                background-color: #f1f1f1;
+            }
+        }
+    }
+}

@@ -63,12 +63,11 @@ export class ProductAdminComponent implements OnInit {
     page: number,
     limit: number
   ) {
-    
+
     this.productService
       .getProducts(keyword, selectedCategoryId, page, limit)
       .subscribe({
         next: (apiResponse: ApiResponse) => {
-          // const products = apiResponse?.data as Product[];
           const response = apiResponse.data;
           response.products.forEach((product: Product) => {
             if (product) {
@@ -119,15 +118,11 @@ export class ProductAdminComponent implements OnInit {
       .map((_, index) => startPage + index);
   }
 
-  // Hàm xử lý sự kiện khi thêm mới sản phẩm
   insertProduct() {
-    // Điều hướng đến trang detail-product với productId là tham số
     this.router.navigate(['/admin/products/insert']);
   }
 
-  // Hàm xử lý sự kiện khi sản phẩm được bấm vào
   updateProduct(productId: number) {
-    // Điều hướng đến trang detail-product với productId là tham số
     this.router.navigate(['/admin/products/update', productId]);
   }
 
@@ -138,13 +133,24 @@ export class ProductAdminComponent implements OnInit {
     if (confirmation) {
       this.productService.deleteProduct(product.id).subscribe({
         next: (apiResponse: ApiResponse) => {
-          console.error('Xóa thành công');
-          location.reload();
+          // 1. Hiển thị thông báo thành công
+          alert('Product deleted successfully');
+
+          // 2. Cập nhật danh sách sản phẩm ngay lập tức
+          this.products = this.products.filter(p => p.id !== product.id);
+
+          // 3. Nếu bạn đang phân trang, cần cập nhật lại tổng số trang
+          if (this.products.length % this.itemsPerPage === 0) {
+            this.totalPages--;
+            this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
+          }
+
+          console.log('Product deleted:', product.id);
         },
-        complete: () => { },
         error: (error: HttpErrorResponse) => {
-          console.error(error?.error?.message ?? '');
-        },
+          console.error('Delete error:', error?.error?.message ?? '');
+          alert('Failed to delete product: ' + (error.error?.message || 'Unknown error'));
+        }
       });
     }
   }

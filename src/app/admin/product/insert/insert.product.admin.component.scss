@@ -1,0 +1,55 @@
+.insert-product-container {
+    padding: 2rem 0;
+
+    .card {
+        border-radius: 0.5rem;
+        overflow: hidden;
+
+        .card-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+    }
+
+    .form-control-lg,
+    .form-select-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .file-upload-area {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+
+        &:hover {
+            background-color: #e9ecef;
+            border-color: #86b7fe;
+        }
+
+        &.is-invalid {
+            border-color: #dc3545;
+        }
+    }
+
+    .btn {
+        min-width: 120px;
+
+        i {
+            margin-right: 0.5rem;
+        }
+    }
+
+    .invalid-feedback {
+        display: none;
+        font-size: 0.875em;
+    }
+
+    .is-invalid~.invalid-feedback,
+    .is-invalid~.invalid-feedback.d-block {
+        display: block;
+    }
+}

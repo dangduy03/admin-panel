@@ -1,0 +1,84 @@
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Create New Inventory Transaction</h4>
+            <button class="btn btn-sm btn-light" (click)="goBack()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="productId" class="form-label">Product</label>
+                        <select id="productId" class="form-select" formControlName="productId">
+                            <option value="">Select Product</option>
+                            @if(products && products.length > 0) {
+                            @for(product of products; track product.id) {
+                            <option [value]="product.id">
+                                {{ product?.name }} (ID: {{ product?.id }})
+                            </option>
+                            }
+                            } @else {
+                            <option disabled>No products available</option>
+                            }
+                        </select>
+                        <div *ngIf="transactionForm.get('productId')?.invalid && transactionForm.get('productId')?.touched"
+                            class="text-danger">
+                            Product is required
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="warehouseId" class="form-label">Warehouse</label>
+                        <select id="warehouseId" class="form-select" formControlName="warehouseId">
+                            <option value="">Select Warehouse</option>
+                            <option *ngFor="let warehouse of warehouses" [value]="warehouse.id">
+                                {{ warehouse.name }} ({{ warehouse.location }})
+                            </option>
+                        </select>
+                        <div *ngIf="transactionForm.get('warehouseId')?.invalid && transactionForm.get('warehouseId')?.touched"
+                            class="text-danger">
+                            Warehouse is required
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="adjustmentType" class="form-label">Transaction Type</label>
+                        <select id="adjustmentType" class="form-select" formControlName="adjustmentType">
+                            <option value="">Select Type</option>
+                            <option *ngFor="let type of transactionTypes" [value]="type">{{ type }}</option>
+                        </select>
+                        <div *ngIf="transactionForm.get('adjustmentType')?.invalid && transactionForm.get('adjustmentType')?.touched"
+                            class="text-danger">
+                            Transaction type is required
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="adjustment" class="form-label">Quantity Adjustment</label>
+                        <input type="number" id="adjustment" class="form-control" formControlName="adjustment">
+                        <div *ngIf="transactionForm.get('adjustment')?.invalid && transactionForm.get('adjustment')?.touched"
+                            class="text-danger">
+                            Quantity must be at least 1
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="note" class="form-label">Note</label>
+                    <textarea id="note" class="form-control" formControlName="note" rows="3"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" (click)="goBack()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success" [disabled]="transactionForm.invalid">
+                        Create Transaction
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
