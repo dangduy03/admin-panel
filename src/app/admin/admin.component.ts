@@ -61,6 +61,8 @@ export class AdminComponent implements OnInit {
       this.router.navigate(['/admin/warehouses']);
     }else if (componentName === 'transactions') {
       this.router.navigate(['/admin/transactions']);
+    }else if (componentName === 'inventories') {
+      this.router.navigate(['/admin/inventories']);
     }
   }
 }

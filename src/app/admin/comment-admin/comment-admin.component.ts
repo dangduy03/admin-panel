@@ -3,6 +3,8 @@ import { CommentService } from '../../../service/comment.service';
 import { ApiResponse } from '../../../reponses/api.response';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Comment } from '../../../models/comment';
 
 @Component({
   selector: 'app-comment-admin',
@@ -15,85 +17,137 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './comment-admin.component.scss'
 })
 export class CommentAdminComponent implements OnInit {
-  comments: any[] = [];
+  comments: Comment[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 10;
-  totalItems: number = 0;
+  totalPages: number = 0;
+  visiblePages: number[] = [];
   searchKeyword: string = '';
-  selectedComment: any = null;
-  editContent: string = '';
+  selectedComment: Comment | null = null;
+  isLoading: boolean = false;
+  errorMessage: string = '';
 
-  constructor(private commentService: CommentService) { }
+  constructor
+    (
+      private commentService: CommentService,
+      private router: Router,
+    ) { }
 
   ngOnInit(): void {
-    this.loadComments();
+    this.getAllComments(this.currentPage, this.itemsPerPage);
   }
 
-  loadComments(): void {
-    const params = {
-      page: this.currentPage,
-      limit: this.itemsPerPage
-    };
+  // getAllComments(page: number, limit: number) {
+  //   this.commentService.getAllComments(page, limit).subscribe({
+  //     next: (response: any) => {
+  //       console.log('Raw API response:', response);
 
-    this.commentService.getAllComments(params).subscribe({
-      next: (response: ApiResponse) => {
-        // Xử lý response theo cấu trúc API
-        this.comments = response.data?.content || response.data || [];
-        this.totalItems = response.data?.totalElements || 0;
+  //       // Xử lý nhiều định dạng response có thể có
+  //       if (Array.isArray(response)) {
+  //         this.comments = response;
+  //         this.totalPages = 1;
+  //       } else if (response?.data) {
+  //         this.comments = response.data;
+  //         this.totalPages = response.meta?.totalPages || 1;
+  //       } else {
+  //         this.comments = [];
+  //         console.error('Unexpected response format:', response);
+  //       }
+
+  //       this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
+  //     },
+  //     error: (error) => {
+  //       console.error('Error details:', {
+  //         status: error.status,
+  //         message: error.message,
+  //         url: error.url,
+  //         error: error.error
+  //       });
+  //       alert('Error loading data. Please check console for details.');
+  //     }
+  //   });
+  // }
+
+
+  getAllComments(page: number, limit: number) {
+    this.isLoading = true;
+    this.commentService.getAllComments(page, limit).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        
+        // Xử lý dữ liệu an toàn hơn
+        let commentsData = [];
+        if (Array.isArray(response)) {
+          commentsData = response;
+          this.totalPages = 1;
+        } else if (response?.data) {
+          commentsData = response.data;
+          this.totalPages = response.meta?.totalPages || 1;
+        }
+  
+        // Đảm bảo mỗi comment có đủ thuộc tính cần thiết
+        this.comments = commentsData.map((comment: any) => ({
+          id: comment.id || 0,
+          content: comment.content || '',
+          user: comment.user || { fullname: 'Nguyễn Quảng' },
+          product: comment.product || { name: 'Không xác định' }
+        }));
+  
+        this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
       },
       error: (error) => {
-        console.error('Error loading comments:', error);
-        alert('Lỗi khi tải bình luận: ' + (error.error?.message || error.message));
+        this.isLoading = false;
+        console.error('Lỗi:', error);
+        alert('Có lỗi khi tải dữ liệu. Vui lòng kiểm tra console để biết chi tiết.');
       }
     });
   }
-
-
-
-  selectComment(comment: any): void {
-    this.selectedComment = comment;
-    this.editContent = comment.content;
-  }
-
-  updateComment(): void {
-    console.log('Editing comment:', this.selectedComment);
-    console.log('New content:', this.editContent);
-
-    this.commentService.updateComment(this.selectedComment.id, this.editContent)
-      .subscribe({
-        next: (res) => {
-          console.log('Update success:', res);
-          alert('Updated successfully!');
-          this.loadComments();
-        },
-        error: (err) => {
-          console.error('Full error:', err);
-          console.error('Error response body:', err.error);
-          alert(`Error: ${err.status} - ${err.error?.message || 'Unknown error'}`);
-        }
-      });
-  }
-
-
-
-  deleteComment(commentId: number): void {
-    if (confirm('Are you sure you want to delete this comment?')) {
-      this.commentService.deleteComment(commentId).subscribe({
-        next: (response: ApiResponse) => {
-          this.loadComments();
-        },
-        error: (error) => {
-          console.error('Error deleting comment:', error);
-        }
-      });
+  deleteComment(comment: Comment) {
+      if (confirm(`Delete inventory for ${comment.user?.fullname}?`)) {
+        this.isLoading = true;
+        this.commentService.deleteComment(comment.id).subscribe({
+          next: () => {
+            this.comments = this.comments.filter(c => c.id !== comment.id);
+            alert('Inventory deleted successfully');
+            this.isLoading = false;
+          },
+          error: (error) => {
+            this.errorMessage = 'Failed to delete inventory';
+            console.error('Error deleting inventory:', error);
+            this.isLoading = false;
+          }
+        });
+      }
     }
+
+  selectComment(comment: Comment): void {
+    this.selectedComment = comment;
   }
 
-  get totalPages(): number {
-    return Math.ceil(this.totalItems / this.itemsPerPage);
+  closeModal(): void {
+    this.selectedComment = null;
+  }
+  searchComments() {
+    this.currentPage = 1;
+    this.getAllComments(this.currentPage, this.itemsPerPage);
   }
 
-  get pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.getAllComments(this.currentPage, this.itemsPerPage);
+  }
+
+  generateVisiblePageArray(currentPage: number, totalPages: number): number[] {
+    const maxVisiblePages = 5;
+    const halfVisiblePages = Math.floor(maxVisiblePages / 2);
+
+    let startPage = Math.max(currentPage - halfVisiblePages, 1);
+    let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+    }
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
   }
 }

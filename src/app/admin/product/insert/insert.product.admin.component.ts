@@ -96,117 +96,20 @@ export class InsertProductAdminComponent implements OnInit {
     this.insertProductDTO.images.splice(index, 1);
   }
 
-  // insertProduct() {
-  //   this.formSubmitted = true;
-
-  //   // Validate form
-  //   if (!this.isFormValid()) {
-  //     alert('Please fill all required fields correctly');
-  //     return;
-  //   }
-
-  //   if (!this.insertProductDTO.images || this.insertProductDTO.images.length === 0) {
-  //     this.imageError = 'Please upload at least one image';
-  //     return;
-  //   }
-
-  //   this.isSubmitting = true;
-
-  //   this.productService.insertProduct(this.insertProductDTO).subscribe({
-  //     next: (apiResponse: ApiResponse) => {
-  //       const productId = apiResponse.data.id;
-
-  //       if (this.insertProductDTO.images.length > 0) {
-  //         this.productService.uploadImages(productId, this.insertProductDTO.images).subscribe({
-  //           next: () => {
-  //             alert('Product created successfully');
-  //             this.router.navigate(['/admin/products']);
-  //           },
-  //           error: (uploadError: HttpErrorResponse) => {
-  //             this.isSubmitting = false;
-  //             alert('Product created but image upload failed');
-  //             console.error('Image upload error:', uploadError?.error?.message ?? '');
-  //             this.router.navigate(['/admin/products']);
-  //           }
-  //         });
-  //       } else {
-  //         alert('Product created successfully');
-  //         this.router.navigate(['/admin/products']);
-  //       }
-  //     },
-  //     error: (error: HttpErrorResponse) => {
-  //       this.isSubmitting = false;
-  //       const errorMsg = error?.error?.message || 'Failed to create product';
-  //       alert(errorMsg);
-  //       console.error('Product creation error:', error);
-  //     }
-  //   });
-  // }
-
-  // insertProduct() {
-  //   this.formSubmitted = true;
-
-  //   if (!this.isFormValid()) {
-  //     alert('Vui lòng điền đầy đủ thông tin bắt buộc');
-  //     return;
-  //   }
-
-  //   if (!this.insertProductDTO.images || this.insertProductDTO.images.length === 0) {
-  //     this.imageError = 'Vui lòng chọn ít nhất 1 ảnh';
-  //     return;
-  //   }
-
-  //   this.isSubmitting = true;
-
-  //   this.productService.insertProduct(this.insertProductDTO).subscribe({
-  //     next: (apiResponse: ApiResponse) => {
-  //       const productId = apiResponse.data.id;
-
-  //       if (this.insertProductDTO.images.length > 0) {
-  //         this.productService.uploadImages(productId, this.insertProductDTO.images).subscribe({
-  //           next: (uploadResponse) => {
-  //             alert('Thêm sản phẩm thành công');
-  //             this.router.navigate(['/admin/products']);
-  //           },
-  //           error: (uploadError) => {
-  //             this.isSubmitting = false;
-  //             console.error('Lỗi upload ảnh:', uploadError);
-  //             alert('Thêm sản phẩm thành công nhưng upload ảnh thất bại');
-  //             this.router.navigate(['/admin/products']);
-  //           }
-  //         });
-  //       } else {
-  //         alert('Thêm sản phẩm thành công');
-  //         this.router.navigate(['/admin/products']);
-  //       }
-  //     },
-  //     error: (error) => {
-  //       this.isSubmitting = false;
-  //       console.error('Lỗi thêm sản phẩm:', error);
-  //       alert(`Lỗi: ${error.error?.message || 'Không thể thêm sản phẩm'}`);
-  //     }
-  //   });
-  // }
-
   insertProduct() {
     this.formSubmitted = true;
-
     if (!this.isFormValid()) {
       alert('Vui lòng điền đầy đủ thông tin bắt buộc');
       return;
     }
-
     if (!this.insertProductDTO.images || this.insertProductDTO.images.length === 0) {
       this.imageError = 'Vui lòng chọn ít nhất 1 ảnh';
       return;
     }
-
     this.isSubmitting = true;
-
     this.productService.insertProduct(this.insertProductDTO).subscribe({
       next: (apiResponse: ApiResponse) => {
         const productId = apiResponse.data.id;
-
         this.productService.uploadImages(productId, this.insertProductDTO.images).subscribe({
           next: (uploadResponse) => {
             // Xử lý response sau khi upload ảnh thành công

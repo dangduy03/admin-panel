@@ -1,38 +1,172 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ApiResponse } from '../reponses/api.response';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
+import { TokenService } from './token.service';
+import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
+import { InventoryDTO } from '../dtos/inventory/inventory.dto';
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class InventoryService {
-    private apiUrl = 'http://localhost:8080/api/v1/inventory';
+    // private apiUrl = 'http://localhost:8080/api/v1/inventory';
+    private apiBaseUrl = environment.apiBaseUrl;
+    constructor(
+        private http: HttpClient,
+        private tokenService: TokenService,
+        private router: Router,
+    ) { }
 
-    constructor(private http: HttpClient) { }
-
-    getInventoryByWarehouse(
-        warehouseId?: number,
-        keyword?: string,
-        page: number = 1,
-        limit: number = 10
-    ): Observable<ApiResponse> {
-        let url = `${this.apiUrl}/warehouses/${warehouseId}?page=${page}&limit=${limit}`;
-        if (keyword) {
-            url += `&keyword=${encodeURIComponent(keyword)}`;
+    private getHeaders(): HttpHeaders {
+        const token = this.tokenService.getToken();
+        if (!token) {
+            this.router.navigate(['/login']); // Redirect if no token
+            throw new Error('No token available');
         }
-        return this.http.get<ApiResponse>(url);
+        return new HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        });
     }
 
-    getAllWarehouses(): Observable<ApiResponse> {
-        return this.http.get<ApiResponse>(`${this.apiUrl}/warehouses`);
+    getInventory(page: number, limit: number): Observable<ApiResponse> {
+        return this.http.get(`${this.apiBaseUrl}/inventory`, {
+            params: new HttpParams()
+                .set('page', page.toString())
+                .set('limit', limit.toString()),
+            headers: this.getHeaders(),
+            observe: 'response'
+        }).pipe(
+            tap(response => console.log('Full response:', response)),
+            map(response => {
+                if (!response.body) {
+                    throw new Error('Empty response body');
+                }
+                return response.body as ApiResponse;
+            }),
+            catchError(error => {
+                console.error('API Error:', {
+                    status: error.status,
+                    message: error.message,
+                    url: error.url,
+                    headers: error.headers,
+                    error: error.error
+                });
+                return throwError(() => error);
+            })
+        );
     }
 
-    adjustInventory(adjustment: any): Observable<ApiResponse> {
-        return this.http.post<ApiResponse>(`${this.apiUrl}/adjust`, adjustment);
+    getInventoryById(id: number): Observable<ApiResponse> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.tokenService.getToken()}`
+        });
+
+        return this.http.get(`${environment.apiBaseUrl}/inventory/${id}`, {
+            headers: headers,
+            observe: 'response' // Giúp debug chi tiết
+        }).pipe(
+            map(response => {
+                console.log('Raw API response:', response); // Log toàn bộ response
+                if (!response.body) {
+                    throw new Error('Empty response body');
+                }
+                return response.body as ApiResponse;
+            }),
+            catchError(error => {
+                console.error('API Error Details:', {
+                    status: error.status,
+                    message: error.message,
+                    url: error.url,
+                    error: error.error
+                });
+                return throwError(() => error);
+            })
+        );
     }
 
-    updateInventory(id: number, inventoryData: any): Observable<ApiResponse> {
-        return this.http.put<ApiResponse>(`${this.apiUrl}/${id}`, inventoryData);
+    createInventory(inventoryDTO: InventoryDTO): Observable<ApiResponse> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.tokenService.getToken()}`
+        });
+
+        const requestBody = {
+            productId: inventoryDTO.product_id,
+            warehouseId: inventoryDTO.warehouse_id,
+            quantity: inventoryDTO.quantity,
+        };
+
+        console.log('Sending to server:', requestBody); // Kiểm tra dữ liệu cuối cùng
+
+        return this.http.post<ApiResponse>(
+            `${environment.apiBaseUrl}/inventory`,
+            // inventoryDTO,
+            requestBody,
+            {
+                headers: headers,
+                observe: 'response' // Thêm để debug
+            }
+        ).pipe(
+            tap(response => console.log('Create response:', response)),
+            map(response => response.body as ApiResponse),
+            catchError(error => {
+                console.error('Create error:', {
+                    status: error.status,
+                    message: error.message,
+                    error: error.error
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    updateInventory(id: number, inventoryDTO: InventoryDTO): Observable<ApiResponse> {
+        const body = {
+            productId: inventoryDTO.product_id,
+            warehouseId: inventoryDTO.warehouse_id,
+            quantity: inventoryDTO.quantity
+        };
+
+        return this.http.put<ApiResponse>(
+            `${this.apiBaseUrl}/inventory/${id}`,
+            body,
+            {
+                headers: this.getHeaders(),
+                observe: 'response'
+            }
+        ).pipe(
+            map(response => response.body as ApiResponse),
+            catchError(error => {
+                console.error('Update error:', {
+                    status: error.status,
+                    message: error.message,
+                    error: error.error
+                });
+                return throwError(() => error);
+            })
+        );
+    }
+
+    deleteInventory(id: number): Observable<ApiResponse> {
+        return this.http.delete<ApiResponse>(
+            `${this.apiBaseUrl}/inventory/${id}`,
+            { headers: this.getHeaders() }
+        ).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    private handleError(error: HttpErrorResponse) {
+        if (error.status === 401) {
+            // Xử lý khi token hết hạn
+            this.tokenService.removeToken();
+            this.router.navigate(['/login']);
+        }
+        return throwError(() => error);
     }
 }

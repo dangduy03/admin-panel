@@ -65,13 +65,11 @@ export class OrderService {
     // Kiểm tra và chuẩn hóa các tham số đầu vào
     const validatedPage = Math.max(page, 0); // Đảm bảo page không âm
     const validatedLimit = Math.max(limit, 1); // Đảm bảo limit ít nhất là 1
-
     // Tạo params với giá trị đã được kiểm tra
     const params = new HttpParams()
       .set('keyword', keyword || '') // Xử lý khi keyword là null/undefined
       .set('page', validatedPage.toString())
       .set('limit', validatedLimit.toString());
-
     try {
       return this.http.get<ApiResponse>(this.apiGetAllOrders, {
         params,
@@ -85,7 +83,6 @@ export class OrderService {
           } else if (error.status === 404) {
             console.error('API endpoint không tồn tại');
           }
-
           // Trả về một Observable lỗi mới với thông báo thân thiện
           return throwError(() => new Error('Có lỗi xảy ra khi tải danh sách đơn hàng. Vui lòng thử lại sau.'));
         })

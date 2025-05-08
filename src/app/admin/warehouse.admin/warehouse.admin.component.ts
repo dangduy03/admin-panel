@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiResponse } from '../../../reponses/api.response';
 import { Warehouse } from '../../../models/warehouse';
 import { WarehouseService } from '../../../service/warehouse.service';
 import { TokenService } from '../../../service/token.service';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-warehouse.admin',
@@ -40,30 +42,46 @@ export class WarehouseAdminComponent implements OnInit {
       next: (response: any) => {
         console.log('Raw API response:', response);
 
-        // Xử lý nhiều định dạng response có thể có
+        let warehouseData;
         if (Array.isArray(response)) {
-          this.warehouses = response;
+          warehouseData = response;
           this.totalPages = 1;
         } else if (response?.data) {
-          this.warehouses = response.data;
+          warehouseData = response.data;
           this.totalPages = response.meta?.totalPages || 1;
         } else {
-          this.warehouses = [];
+          warehouseData = [];
           console.error('Unexpected response format:', response);
         }
 
+        // Xử lý chuyển đổi ngày tháng từ mảng số sang Date object
+        this.warehouses = warehouseData.map((item: any) => ({
+          ...item,
+          createdAt: this.arrayToDate(item.createdAt),
+          updatedAt: this.arrayToDate(item.updatedAt)
+        }));
+
+        console.log('Processed warehouses:', this.warehouses);
         this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
       },
       error: (error) => {
-        console.error('Error details:', {
-          status: error.status,
-          message: error.message,
-          url: error.url,
-          error: error.error
-        });
-        alert('Error loading data. Please check console for details.');
+        console.error('Error loading warehouses:', error);
       }
     });
+  }
+
+  private arrayToDate(dateArray: number[]): Date | null {
+    if (!dateArray || dateArray.length < 6) return null;
+
+    // Lưu ý: Tháng trong JavaScript bắt đầu từ 0 (0-11)
+    return new Date(
+      dateArray[0],  // năm
+      dateArray[1] - 1,  // tháng (trừ 1)
+      dateArray[2],  // ngày
+      dateArray[3],  // giờ
+      dateArray[4],  // phút
+      dateArray[5]   // giây
+    );
   }
 
   searchWarehouses() {
@@ -114,6 +132,81 @@ export class WarehouseAdminComponent implements OnInit {
           alert(`Failed to delete warehouse: ${error.error?.message || 'Unknown error'}`);
         }
       });
+    }
+  }
+
+  // Thêm các hàm export
+  exportToExcel(): void {
+    // Chuẩn bị dữ liệu
+    const data = this.warehouses.map(warehouse => ({
+      'ID': warehouse.id,
+      'Name': warehouse.name,
+      'Location': warehouse.location,
+      'Created At': warehouse.createdAt ? this.formatDate(warehouse.createdAt) : '',
+      'Updated At': warehouse.updatedAt ? this.formatDate(warehouse.updatedAt) : ''
+    }));
+
+    // Tạo worksheet
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+
+    // Tạo workbook
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Warehouses');
+
+    // Xuất file
+    XLSX.writeFile(wb, 'Warehouses_Report.xlsx');
+  }
+  private formatDate(date: Date): string {
+    return date.toLocaleString();
+  }
+  async exportToPDF(): Promise<void> {
+    try {
+      // 1. Lấy bảng cần export
+      const table = document.getElementById('warehouseTable');
+      if (!table) {
+        console.error('Table element not found');
+        return;
+      }
+      // 2. Tạo bản sao và đặt style đơn giản
+      const clone = table.cloneNode(true) as HTMLElement;
+      // Áp dụng CSS đơn giản
+      const style = document.createElement('style');
+      style.textContent = `
+        * {
+          color: black !important;
+          background: white !important;
+          border-color: #ddd !important;
+        }
+        .btn { display: none !important; }
+      `;
+      clone.prepend(style);
+      // 3. Tạo container ẩn
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'fixed';
+      tempDiv.style.left = '-10000px';
+      tempDiv.style.top = '0';
+      tempDiv.appendChild(clone);
+      document.body.appendChild(tempDiv);
+      // 4. Thêm delay để đảm bảo DOM đã render
+      await new Promise(resolve => setTimeout(resolve, 200));
+      // 5. Tạo PDF với các tùy chọn tối ưu
+      const canvas = await html2canvas(clone, {
+        logging: true,
+        useCORS: true,
+        allowTaint: true,
+      });
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 190;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      pdf.addImage(canvas, 'PNG', 10, 10, imgWidth, imgHeight);
+      pdf.save(`Warehouses_${new Date().toISOString().slice(0, 10)}.pdf`);
+    } catch (error) {
+      console.error('PDF Export Error:', error);
+      alert('PDF generation failed. See console for details.');
+    } finally {
+      // 6. Dọn dẹp
+      const tempDivs = document.querySelectorAll('div[style*="-10000px"]');
+      tempDivs.forEach(div => div.remove());
     }
   }
 }

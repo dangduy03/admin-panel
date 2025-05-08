@@ -17,6 +17,9 @@ import { UpdateWarehouseAdminComponent } from "./warehouse.admin/update/update.w
 import { InventoryTransactionAdminComponent } from "./inventory-transaction.admin/inventory-transaction.admin.component";
 import { UpdateInventoryTransactionAdminComponent } from "./inventory-transaction.admin/update/update.inventory-transaction.admin.component";
 import { InsertInventoryTransactionAdminComponent } from "./inventory-transaction.admin/insert/insert.inventory-transaction.admin.component";
+import { InventoryAdminComponent } from "./inventory.admin/inventory.admin.component";
+import { InsertInventoryAdminComponent } from "./inventory.admin/insert/insert.inventory.admin.component";
+import { UpdateInventoryAdminComponent } from "./inventory.admin/update/update.inventory.admin.component";
 
 export const adminRoutes: Routes = [
     {
@@ -65,7 +68,11 @@ export const adminRoutes: Routes = [
 
             { path: 'transactions', component: InventoryTransactionAdminComponent },
             { path: 'transactions/insert', component: InsertInventoryTransactionAdminComponent},
-            { path: 'transactions/update/:id', component: UpdateInventoryTransactionAdminComponent }
+            { path: 'transactions/update/:id', component: UpdateInventoryTransactionAdminComponent },
+
+            { path: 'inventories', component: InventoryAdminComponent },
+            { path: 'inventories/insert', component: InsertInventoryAdminComponent},
+            { path: 'inventories/update/:id', component: UpdateInventoryAdminComponent }
         ]
     }
 ];

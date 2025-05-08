@@ -1,18 +1,23 @@
-
 <div class="container mt-4">
-    <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Inventory Transactions</h1>
-        <button class="btn btn-success" (click)="insertTransaction()">
-            <i class="fas fa-plus me-2"></i>Add New
-        </button>
+        <div>
+            <button class="btn btn-success" (click)="insertTransaction()">
+                <i class="fas fa-plus me-2"></i>Add New
+            </button>
+            <button class="btn btn-success ms-1" (click)="exportToExcel()">
+                <i class="fas fa-file-excel me-2"></i>Export Excel
+            </button>
+            <button class="btn btn-danger ms-1" (click)="exportToPDF()">
+                <i class="fas fa-file-pdf me-2"></i>Export PDF
+            </button>
+        </div>
     </div>
 
-    <!-- Search and Filter Section -->
     <div class="card mb-4">
         <div class="card-body">
-            <div class="row g-3">
-                <!-- Search Input -->
+            <div class="row g-3 align-items-end">
+                <!-- Tìm kiếm và nút Search -->
                 <div class="col-md-8">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
@@ -25,8 +30,9 @@
                     </button>
                 </div>
 
-                <!-- Filters -->
+                <!-- Bộ lọc -->
                 <div class="col-md-3">
+                    <label class="form-label small text-muted">Type</label>
                     <select class="form-select" [(ngModel)]="filterType">
                         <option value="ALL">All Types</option>
                         <option value="IMPORT">Import</option>
@@ -44,7 +50,7 @@
                     <input type="date" class="form-control" [(ngModel)]="endDate">
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-outline-primary w-100 mt-4" (click)="applyFilters()">
+                    <button class="btn btn-outline-primary w-100" (click)="applyFilters()">
                         <i class="fas fa-filter me-2"></i>Apply Filters
                     </button>
                 </div>
@@ -56,16 +62,17 @@
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover mb-0" id="inventoryTransactionsTable">
                     <thead class="table-light">
                         <tr>
-                            <th width="80px">ID</th>
-                            <th width="150px">Date</th>
+                            <th>ID</th>
                             <th>Product</th>
                             <th>Warehouse</th>
                             <th width="120px">Type</th>
                             <th width="120px">Quantity</th>
                             <th>Note</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
                             <th width="180px">Actions</th>
                         </tr>
                     </thead>
@@ -75,7 +82,7 @@
                         @for(transaction of transactions; track transaction.id) {
                         <tr>
                             <td class="fw-bold">{{ transaction.id }}</td>
-                            <td>{{ transaction.createdAt | date:'medium' }}</td>
+
                             <td>{{ transaction.product.name }}</td>
                             <td>{{ transaction.warehouse.name }}</td>
                             <td>
@@ -93,6 +100,8 @@
                                 {{ transaction.quantityChange > 0 ? '+' : '' }}{{ transaction.quantityChange }}
                             </td>
                             <td>{{ transaction.note }}</td>
+                            <td>{{ transaction.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+                            <td>{{ transaction.updatedAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-sm btn-outline-primary"
@@ -109,7 +118,7 @@
                         }
                     </tbody>
 
-                    
+
                 </table>
             </div>
 

@@ -1,56 +1,74 @@
-<div class="comment-admin-container">
-    <h2>Quản lý bình luận</h2>
+<div class="container">
+    <h2>Comments Management</h2>
 
-    <div class="comments-list">
-        <table *ngIf="comments.length > 0">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Người dùng</th>
-                    <th>Sản phẩm</th>
-                    <th>Nội dung</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let comment of comments">
-                    <td>{{ comment.id }}</td>
-                    <td>{{ comment.user?.fullname || 'Nguyễn Quảng' }}</td>
-                    <td>{{ comment.product?.name || 'Sản phẩm ' }}</td>
-                    <td>{{ comment.content }}</td>
-                    <td class="actions">
-                        <button (click)="selectComment(comment)">Sửa</button>
-                        <button (click)="deleteComment(comment.id)" class="delete">Xóa</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div *ngIf="comments.length === 0" class="no-comments">
-            Chưa có bình luận nào
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <input type="text" class="form-control" placeholder="Search comments..." [(ngModel)]="searchKeyword"
+                (keyup.enter)="searchComments()">
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary" (click)="searchComments()">Search</button>
         </div>
     </div>
 
-    <div *ngIf="selectedComment" class="edit-modal">
-        <h3>Sửa bình luận</h3>
-        <textarea [(ngModel)]="editContent" rows="4"></textarea>
-        <div class="modal-actions">
-            <button (click)="updateComment()">Lưu</button>
-            <button (click)="selectedComment = null">Hủy</button>
-        </div>
-    </div>
-</div>
+    <table class="table">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <!-- <th>Product</th> -->
+                <th>Content</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(comment of comments; track comment.id) {
+            <tr>
+                <td>{{ comment.id }}</td>
+                <td>{{ comment.user.fullname || 'Nguyễn Quảng'}}</td>
+                <!-- <td>{{ comment.product.name || 'Không xác định' }}</td> -->
+                <td>{{ comment.content }}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" (click)="deleteComment(comment)">Delete</button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
 
-<div class="pagination" *ngIf="totalItems > itemsPerPage">
-    <button (click)="currentPage = 0; loadComments()" [disabled]="currentPage === 0">
-        Đầu
-    </button>
-    <button (click)="currentPage = currentPage - 1; loadComments()" [disabled]="currentPage === 0">
-        Trước
-    </button>
-    <span>Trang {{currentPage + 1}}</span>
-    <button (click)="currentPage = currentPage + 1; loadComments()"
-        [disabled]="(currentPage + 1) * itemsPerPage >= totalItems">
-        Sau
-    </button>
+
+    @if (totalPages > 1) {
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if(currentPage > 1) {
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(1)">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)">
+                        <i class="fa fa-chevron-left"></i>
+                    </a>
+                </li>
+                }
+
+                @for(page of visiblePages; track page) {
+                <li class="page-item" [ngClass]="{'active': page === currentPage}">
+                    <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+                </li>
+                }
+
+                @if(currentPage < totalPages) { <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)">
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" (click)="onPageChange(totalPages)">Last</a>
+                    </li>
+                    }
+            </ul>
+        </nav>
+    </div>
+    }
 </div>

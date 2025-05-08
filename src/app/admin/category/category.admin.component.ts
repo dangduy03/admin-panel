@@ -68,7 +68,6 @@ export class CategoryAdminComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-
     const confirmation = confirm('Bạn chắc chắn muốn xóa danh mục này?');
     if (confirmation) {
       this.categoryService.deleteCategory(category.id).subscribe({
