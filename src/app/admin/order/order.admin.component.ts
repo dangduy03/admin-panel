@@ -8,6 +8,9 @@ import { OrderResponse } from '../../../reponses/order/order.response';
 import { OrderService } from '../../../service/order.service';
 import { ApiResponse } from '../../../reponses/api.response';
 import { TokenService } from '../../../service/token.service';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-order-admin',
@@ -163,6 +166,102 @@ export class OrderAdminComponent implements OnInit {
 
   viewDetails(order: OrderResponse) {
     this.router.navigate(['/admin/orders', order.id]);
+  }
+
+  // Thêm các hàm export
+  exportToExcel(): void {
+    // Chuẩn bị dữ liệu
+    const data = this.orders.map(order => ({
+      'ID': order.id || '-',
+      'User ID': order.user_id || '-',
+      'Full Name': order.fullname || '-',
+      'Email': order.email || '-',
+      'Phone': order.phone_number || '-',
+      'Address': order.address || '-',
+      'Note': order.note || '-',
+      'Order Date': order.order_date ? this.formatDate(order.order_date) : '-',
+      'Status': order.status || '-',
+      'Total Money': order.total_money || 0
+    }));
+    // Tạo worksheet
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    // Tạo workbook
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+    // Xuất file
+    XLSX.writeFile(wb, `Orders_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+  private formatDate(date: Date | string | null | undefined): string {
+    if (!date) return '-';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return '-'; // Kiểm tra Date hợp lệ
+    return dateObj.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+  async exportToPDF(): Promise<void> {
+    try {
+      // 1. Lấy bảng cần export
+      const table = document.getElementById('orderTable');
+      if (!table) {
+        console.error('Table element not found');
+        return;
+      }
+      // 2. Tạo bản sao và đặt style đơn giản
+      const clone = table.cloneNode(true) as HTMLElement;
+      // Áp dụng CSS đơn giản
+      const style = document.createElement('style');
+      style.textContent = `
+        * {
+          color: black !important;
+          background: white !important;
+          border-color: #ddd !important;
+        }
+        .btn { display: none !important; }
+        .badge { 
+          color: white !important;
+          padding: 0.25em 0.4em;
+          border-radius: 0.25rem;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ddd; }
+      `;
+      clone.prepend(style);
+      // 3. Tạo container ẩn
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'fixed';
+      tempDiv.style.left = '-10000px';
+      tempDiv.style.top = '0';
+      tempDiv.appendChild(clone);
+      document.body.appendChild(tempDiv);
+      // 4. Thêm delay để đảm bảo DOM đã render
+      await new Promise(resolve => setTimeout(resolve, 200));
+      // 5. Tạo PDF với các tùy chọn tối ưu
+      const canvas = await html2canvas(clone, {
+        logging: true,
+        useCORS: true,
+        allowTaint: true,
+        // scale: 1.5 // Tăng scale để cải thiện chất lượng
+      });
+      const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape mode để phù hợp với bảng rộng
+      const imgWidth = 280; // Tăng chiều rộng cho landscape
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      pdf.addImage(canvas, 'PNG', 10, 10, imgWidth, imgHeight);
+      pdf.save(`Orders_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
+    } catch (error) {
+      console.error('PDF Export Error:', error);
+      alert('PDF generation failed. See console for details.');
+    } finally {
+      // 6. Dọn dẹp
+      const tempDivs = document.querySelectorAll('div[style*="-10000px"]');
+      tempDivs.forEach(div => div.remove());
+    }
   }
 
 }

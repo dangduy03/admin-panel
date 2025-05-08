@@ -87,9 +87,7 @@ export class InsertInventoryTransactionAdminComponent implements OnInit {
                 adjustment: this.transactionForm.value.adjustment,
                 note: this.transactionForm.value.note
             });
-
             console.log('Data to be sent:', transactionData); // Kiểm tra dữ liệu trước khi gửi
-
             this.transactionService.createTransaction(transactionData).subscribe({
                 next: () => {
                     alert('Transaction created successfully');

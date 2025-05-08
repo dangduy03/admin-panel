@@ -1,1 +1,75 @@
-<p>update.inventory.admin works!</p>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Update Inventory</h4>
+            <button class="btn btn-sm btn-light" (click)="goBack()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="inventoryForm" (ngSubmit)="onSubmit()">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="productId" class="form-label">Product</label>
+                        <select id="productId" class="form-select" formControlName="productId">
+                            <option value="">Select Product</option>
+                            @if(products && products.length > 0) {
+                            @for(product of products; track product.id) {
+                            <option [value]="product.id">
+                                {{ product?.name }} (ID: {{ product?.id }})
+                            </option>
+                            }
+                            } @else {
+                            <option disabled>No products available</option>
+                            }
+                        </select>
+                        <div *ngIf="inventoryForm.get('productId')?.invalid && inventoryForm.get('productId')?.touched"
+                            class="text-danger">
+                            Product is required
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="warehouseId" class="form-label">Warehouse</label>
+                        <select id="warehouseId" class="form-select" formControlName="warehouseId">
+                            <option value="">Select Warehouse</option>
+                            @for(warehouse of warehouses; track warehouse.id) {
+                            <option [value]="warehouse.id">
+                                {{ warehouse.name }} ({{ warehouse.location }})
+                            </option>
+                            }
+                        </select>
+                        <div *ngIf="inventoryForm.get('warehouseId')?.invalid && inventoryForm.get('warehouseId')?.touched"
+                            class="text-danger">
+                            Warehouse is required
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" id="quantity" class="form-control" formControlName="quantity">
+                        <div *ngIf="inventoryForm.get('quantity')?.invalid && inventoryForm.get('quantity')?.touched"
+                            class="text-danger">
+                            Quantity must be at least 1
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="mb-3">
+                    <label for="note" class="form-label">Note</label>
+                    <textarea id="note" class="form-control" formControlName="note" rows="3"></textarea>
+                </div> -->
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" (click)="goBack()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="inventoryForm.invalid">
+                        Update Inventory
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

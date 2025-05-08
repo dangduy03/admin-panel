@@ -64,11 +64,9 @@ export class UpdateCategoryAdminComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-
     const updateCategoryDTO: UpdateCategoryDTO = {
       name: this.updatedCategory.name
     };
-
     this.categoryService.updateCategory(this.categoryId, updateCategoryDTO).subscribe({
       next: () => {
         alert('Cập nhật thành công!');

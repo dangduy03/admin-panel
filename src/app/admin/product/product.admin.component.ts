@@ -135,16 +135,13 @@ export class ProductAdminComponent implements OnInit {
         next: (apiResponse: ApiResponse) => {
           // 1. Hiển thị thông báo thành công
           alert('Product deleted successfully');
-
           // 2. Cập nhật danh sách sản phẩm ngay lập tức
           this.products = this.products.filter(p => p.id !== product.id);
-
           // 3. Nếu bạn đang phân trang, cần cập nhật lại tổng số trang
           if (this.products.length % this.itemsPerPage === 0) {
             this.totalPages--;
             this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
           }
-
           console.log('Product deleted:', product.id);
         },
         error: (error: HttpErrorResponse) => {

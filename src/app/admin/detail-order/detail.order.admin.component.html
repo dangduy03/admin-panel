@@ -1,34 +1,40 @@
-<div class="container py-4">
+<div class="container py-6" id="orderExportContainer">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="mb-0">Chi tiết đơn hàng #{{orderResponse.id}}</h1>
+    <h1 class="mb-0">Order details #{{orderResponse.id}}</h1>
+    <button class="btn btn-success me-2" (click)="exportToExcel()">
+      <i class="fas fa-file-excel me-2"></i>Export Excel
+    </button>
+    <button class="btn btn-danger me-2" (click)="exportToPDF()">
+      <i class="fas fa-file-pdf me-2"></i>Export PDF
+    </button>
     <button class="btn btn-outline-secondary" (click)="goBack()">
-      <i class="fas fa-arrow-left me-2"></i>Quay lại
+      <i class="fas fa-arrow-left me-2"></i>Come Back
     </button>
   </div>
 
   <div class="card mb-4">
     <div class="card-header bg-light">
-      <h3 class="mb-0">Thông tin đơn hàng</h3>
+      <h3 class="mb-0">Order information</h3>
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
-            <label class="fw-bold">Khách hàng:</label>
+            <label class="fw-bold">Customer:</label>
             <p>{{ orderResponse.fullname }}</p>
           </div>
           <div class="mb-3">
-            <label class="fw-bold">Số điện thoại:</label>
+            <label class="fw-bold">Phone Number:</label>
             <p>{{ orderResponse.phone_number }}</p>
           </div>
           <div class="mb-3">
-            <label class="fw-bold">Địa chỉ:</label>
+            <label class="fw-bold">Address:</label>
             <p>{{ orderResponse.address }}</p>
           </div>
         </div>
         <div class="col-md-6">
           <div class="mb-3">
-            <label class="fw-bold">Ngày đặt:</label>
+            <label class="fw-bold">Date booked:</label>
             <p>{{ orderResponse.order_date | date:'dd/MM/yyyy HH:mm' }}</p>
           </div>
           <div class="mb-3">
@@ -36,7 +42,7 @@
             <p>{{ orderResponse.email }}</p>
           </div>
           <div class="mb-3">
-            <label class="fw-bold">Ghi chú:</label>
+            <label class="fw-bold">Note:</label>
             <p>{{ orderResponse.note || 'Không có ghi chú' }}</p>
           </div>
         </div>
@@ -46,17 +52,17 @@
 
   <div class="card mb-4">
     <div class="card-header bg-light">
-      <h3 class="mb-0">Danh sách sản phẩm</h3>
+      <h3 class="mb-0">Product List</h3>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover mb-0">
           <thead class="table-light">
             <tr>
-              <th width="40%">Sản phẩm</th>
-              <th width="15%" class="text-end">Đơn giá</th>
-              <th width="15%" class="text-center">Số lượng</th>
-              <th width="15%" class="text-end">Thành tiền</th>
+              <th width="40%">Product</th>
+              <th width="15%" class="text-end">Price</th>
+              <th width="15%" class="text-center">Quantity</th>
+              <th width="15%" class="text-end">Total amount</th>
               <th width="15%"></th>
             </tr>
           </thead>
@@ -90,7 +96,7 @@
   <div class="row">
     <div class="col-md-8">
       <div class="form-group mb-3">
-        <label class="fw-bold">Trạng thái đơn hàng:</label>
+        <label class="fw-bold">Order status:</label>
         <select class="form-select" [(ngModel)]="orderResponse.status">
           <option value="Pending">Chờ xử lý</option>
           <option value="Processing">Đang xử lý</option>
@@ -104,15 +110,15 @@
       <div class="card">
         <div class="card-body">
           <div class="d-flex justify-content-between mb-2">
-            <span class="fw-bold">Tổng tiền:</span>
+            <span class="fw-bold">Total amount:</span>
             <span>{{ orderResponse.total_money | currency:'VND':'symbol':'1.0-0' }}</span>
           </div>
           <div class="d-flex justify-content-between mb-3">
-            <span class="fw-bold">Phương thức thanh toán:</span>
+            <span class="fw-bold">Payment method:</span>
             <span>{{ orderResponse.payment_method || 'Chưa xác định' }}</span>
           </div>
           <button class="btn btn-primary w-100" (click)="saveOrder()">
-            <i class="fas fa-save me-2"></i>Cập nhật đơn hàng
+            <i class="fas fa-save me-2"></i>Update order
           </button>
         </div>
       </div>

@@ -1,51 +1,95 @@
-<!-- <div class="container">
+<div class="container">
     <h1>Inventory Management</h1>
+
     <div class="row mb-3">
-        <div class="col-md-4">
-            <select class="form-select" [(ngModel)]="selectedWarehouseId" (change)="onWarehouseChange()">
-                <option value="0">All Warehouses</option>
-                @for(warehouse of warehouses; track warehouse.id) {
-                <option [value]="warehouse.id">{{ warehouse.name }}</option>
-                }
-            </select>
+        <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="Search inventories..." [(ngModel)]="searchKeyword"
+                (keyup.enter)="searchInventories()">
         </div>
-        <div class="col-md-4">
-            <input type="text" class="form-control" placeholder="Search products" [(ngModel)]="productKeyword">
-        </div>
-        <div class="col-md-4">
-            <button class="btn btn-primary" (click)="searchInventory()">Search</button>
-            <button class="btn btn-success ms-2" (click)="adjustInventory()">Adjust Inventory</button>
+        <div class="col-md-6">
+            <button class="btn btn-primary" (click)="searchInventories()">Search</button>
+            <button class="btn btn-success ms-2" (click)="insertInventory()">
+                <i class="fas fa-plus me-2"></i>Add New
+            </button>
+            <button class="btn btn-success ms-1" (click)="exportToExcel()">
+                <i class="fas fa-file-excel me-2"></i>Export Excel
+            </button>
+            <button class="btn btn-danger ms-1" (click)="exportToPDF()">
+                <i class="fas fa-file-pdf me-2"></i>Export PDF
+            </button>
         </div>
     </div>
 
-    <table class="table">
+    <table class="table" id="inventoryTable">
         <thead class="table-light">
             <tr>
+                <th>ID</th>
                 <th>Product</th>
                 <th>Warehouse</th>
                 <th>Quantity</th>
+                <th>Created At</th>
+                <th>Updated At</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @for(inventory of inventories; track inventory.id) {
             <tr>
-                <td>{{ inventory.product?.name }}</td>
-                <td>{{ inventory.warehouse?.name }}</td>
+                <td>{{ inventory.id }}</td>
+                <td>{{ inventory.product.name }}</td>
+                <td>{{ inventory.warehouse.name }}</td>
                 <td>{{ inventory.quantity }}</td>
+                <td>{{ inventory.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+                <td>{{ inventory.updatedAt | date:'yyyy-MM-dd HH:mm:ss'}}</td>
                 <td>
-                    <button class="btn btn-primary" (click)="updateInventory(inventory.id)">Update</button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary"
+                            (click)="updateInventory(inventory.id)">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger"
+                            (click)="deleteInventory(inventory)">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                    </div>
                 </td>
             </tr>
             }
         </tbody>
     </table>
 
+    @if (totalPages > 1) {
     <div class="d-flex justify-content-center">
         <nav aria-label="Page navigation">
             <ul class="pagination">
+                @if(currentPage > 1) {
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(1)">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)">
+                        <i class="fa fa-chevron-left"></i>
+                    </a>
+                </li>
+                }
 
+                @for(page of visiblePages; track page) {
+                <li class="page-item" [ngClass]="{'active': page === currentPage}">
+                    <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+                </li>
+                }
+
+                @if(currentPage < totalPages) { <li class="page-item">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)">
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" (click)="onPageChange(totalPages)">Last</a>
+                    </li>
+                    }
             </ul>
         </nav>
     </div>
-</div> -->
+    }
+</div>

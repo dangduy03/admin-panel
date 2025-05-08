@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../environments/environment';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { ApiResponse } from '../reponses/api.response';
 import { TokenService } from './token.service';
 import { Router } from '@angular/router';
@@ -32,88 +32,53 @@ export class CommentService {
         });
     }
 
-    getCommentsByProduct(productId: number): Observable<ApiResponse> {
-        return this.http.get<ApiResponse>(`${this.apiUrl}?product_id=${productId}`,
-            {
-                headers: this.getHeaders() // Thêm headers xác thực
-            }
-        );
-    }
-
-    addComment(productId: number, userId: number, content: string): Observable<ApiResponse> {
-        const commentDTO = {
-            product_id: productId,
-            user_id: userId,
-            content: content
-        };
-        return this.http.post<ApiResponse>(this.apiUrl, commentDTO, {
-            headers: this.getHeaders() // Thêm headers xác thực
-        });
-    }
-
-    getAllComments(params?: {
-        page?: number;
-        limit?: number;
-        search?: string;
-    }): Observable<ApiResponse> {
-        // Thiết lập params mặc định
-        const defaultParams = {
-            page: params?.page ?? 0,  // API của bạn bắt đầu từ page 0
-            limit: params?.limit ?? 10
-        };
-
-        // Thêm search nếu có
-        const requestParams = params?.search
-            ? { ...defaultParams, search: params.search }
-            : defaultParams;
-
-        return this.http.get<ApiResponse>(this.apiGetAllComments, {
+    getAllComments(page: number, limit: number): Observable<ApiResponse> {
+        return this.http.get(this.apiGetAllComments, {
+            params: new HttpParams()
+                .set('page', page.toString())
+                .set('limit', limit.toString()),
             headers: this.getHeaders(),
-            params: requestParams
+            observe: 'response'
         }).pipe(
+            tap(response => console.log('Full response:', response)),
+            map(response => {
+                if (!response.body) {
+                    throw new Error('Empty response body');
+                }
+                return response.body as ApiResponse;
+            }),
             catchError(error => {
-                console.error('Error fetching comments:', error);
+                console.error('API Error:', {
+                    status: error.status,
+                    message: error.message,
+                    url: error.url,
+                    headers: error.headers,
+                    error: error.error
+                });
                 return throwError(() => error);
             })
         );
     }
 
-    // Xóa comment
+
     deleteComment(commentId: number): Observable<ApiResponse> {
         return this.http.delete<ApiResponse>(
             `${this.apiUrl}/${commentId}`,
             { headers: this.getHeaders() }
+        ).pipe(
+            catchError(this.handleError)
         );
     }
 
-    // Cập nhật nội dung comment
-    // updateComment(commentId: number, content: string): Observable<ApiResponse> {
-    //     return this.http.put<ApiResponse>(
-    //         `${this.apiUrl}/${commentId}`,
-    //         { content },
-    //         { headers: this.getHeaders() }
-    //     );
-    // }
+    private handleError(error: HttpErrorResponse) {
+        if (error.status === 401) {
+            // Xử lý khi token hết hạn
+            this.tokenService.removeToken();
+            this.router.navigate(['/login']);
+        }
+        return throwError(() => error);
+    }
 
-    // updateComment(commentId: number, content: string): Observable<ApiResponse> {
-    //     const updateData = {
-    //         content: content
-    //         // Thêm các trường khác nếu API yêu cầu
-    //     };
-
-    //     return this.http.put<ApiResponse>(
-    //         `${this.apiUrl}/${commentId}`,
-    //         updateData,
-    //         {
-    //             headers: this.getHeaders()
-    //         }
-    //     ).pipe(
-    //         catchError(error => {
-    //             console.error('Update comment error:', error);
-    //             return throwError(() => error);
-    //         })
-    //     );
-    // }
 
     updateComment(commentId: number, content: string): Observable<ApiResponse> {
         // Thử nghiệm với các format data khác nhau

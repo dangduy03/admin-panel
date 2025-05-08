@@ -1,21 +1,31 @@
 <div class="container">
     <h1>Warehouse Management</h1>
     <div class="row mb-3">
-        <div class="col-md-8">
-            <input type="text" class="form-control search-input" placeholder="Search warehouses" >
+        <div class="col-md-6">
+            <input type="text" class="form-control search-input" placeholder="Search warehouses">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <button class="btn btn-primary" (click)="searchWarehouses()">Search</button>
-            <button class="btn btn-success ms-2" (click)="insertWarehouse()">Add New</button>
+            <button class="btn btn-success ms-2" (click)="insertWarehouse()">
+                <i class="fas fa-plus me-2"></i>Add New
+            </button>
+            <button class="btn btn-success ms-1" (click)="exportToExcel()">
+                <i class="fas fa-file-excel me-2"></i>Export Excel
+            </button>
+            <button class="btn btn-danger ms-1" (click)="exportToPDF()">
+                <i class="fas fa-file-pdf me-2"></i>Export PDF
+            </button>
         </div>
     </div>
 
-    <table class="table">
+    <table class="table" id="warehouseTable">
         <thead class="table-light">
             <tr>
                 <th>ID</th>
                 <th>Name</th>
                 <th>Location</th>
+                <th>Created At</th>
+                <th>Updated At</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -25,6 +35,8 @@
                 <td>{{ warehouse.id }}</td>
                 <td>{{ warehouse.name }}</td>
                 <td>{{ warehouse.location }}</td>
+                <td>{{ warehouse.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+                <td>{{ warehouse.updatedAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
                 <td>
                     <div style="display: flex; gap: 10px;">
                         <button class="btn btn-primary" (click)="updateWarehouse(warehouse.id)">
